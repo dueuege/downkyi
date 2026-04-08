@@ -18,6 +18,35 @@ public partial class DownloadingViewModel : ViewModelBase
     {
     }
 
+    /// <summary>Loads persisted downloading items from DB on app start (S2-06).</summary>
+    public async Task LoadAsync()
+    {
+        var entities = await DownloadDatabase.Instance.GetAllDownloadingAsync();
+        DownloadingList.Clear();
+        foreach (var e in entities)
+        {
+            // Items that were actively downloading when the app closed are reset to Waiting
+            var status = e.Status == DownloadStatus.Downloading ? DownloadStatus.Waiting : e.Status;
+            DownloadingList.Add(new DownloadingItem
+            {
+                Uuid = e.Uuid,
+                Avid = e.Avid,
+                Bvid = e.Bvid,
+                Cid = e.Cid,
+                Epid = e.Epid,
+                ContentType = e.ContentType,
+                Quality = e.Quality,
+                Title = e.Title,
+                CoverUrl = e.CoverUrl,
+                UpperName = e.UpperName,
+                FilePath = e.FilePath,
+                Status = status,
+                DownloadVideo = e.DownloadVideo,
+                DownloadAudio = e.DownloadAudio,
+            });
+        }
+    }
+
     /// <summary>Adds an item to the observable download list (called by AddToDownloadService).</summary>
     public void AddItem(DownloadingItem item)
     {

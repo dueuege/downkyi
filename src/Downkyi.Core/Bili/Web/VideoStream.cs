@@ -4,7 +4,7 @@ using Downkyi.Core.Bili.Models.VideoStream;
 
 namespace Downkyi.Core.Bili.Web;
 
-internal static class VideoStreamApi
+public static class VideoStreamApi
 {
     private static readonly NLog.Logger Log = NLog.LogManager.GetCurrentClassLogger();
 
