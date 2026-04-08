@@ -8,6 +8,7 @@ using Downkyi.Core.Settings.Enum;
 using Downkyi.Core.Settings.Models;
 using Downkyi.UI.Models;
 using Downkyi.UI.Mvvm;
+using Downkyi.UI.Services.Download;
 using Downkyi.UI.Services.VideoInfo;
 using Downkyi.UI.ViewModels.DownloadManager;
 using Downkyi.UI.ViewModels.User;
@@ -19,6 +20,8 @@ public partial class VideoDetailViewModel : ViewModelBase
     public const string Key = "VideoDetail";
 
     private readonly IVideoInfoServiceFactory _videoInfoServiceFactory;
+    private readonly DownloadingViewModel _downloadingViewModel;
+    private readonly DownloadFinishedViewModel _downloadFinishedViewModel;
 
     // 保存输入字符串，避免被用户修改
     private string? _input = null;
@@ -52,9 +55,13 @@ public partial class VideoDetailViewModel : ViewModelBase
     #endregion
 
     public VideoDetailViewModel(BaseServices baseServices,
-        IVideoInfoServiceFactory videoInfoServiceFactory) : base(baseServices)
+        IVideoInfoServiceFactory videoInfoServiceFactory,
+        DownloadingViewModel downloadingViewModel,
+        DownloadFinishedViewModel downloadFinishedViewModel) : base(baseServices)
     {
         _videoInfoServiceFactory = videoInfoServiceFactory;
+        _downloadingViewModel = downloadingViewModel;
+        _downloadFinishedViewModel = downloadFinishedViewModel;
         ContentVisibility = true;
     }
 
@@ -173,6 +180,36 @@ public partial class VideoDetailViewModel : ViewModelBase
     private async Task Upper()
     {
         await NavigateToViewUserSpace(VideoInfoView.UpperMid);
+    }
+
+    /// <summary>Adds selected pages to the download queue.</summary>
+    [RelayCommand]
+    private async Task AddToDownloadAsync(bool downloadAll = false)
+    {
+        string directory;
+
+        // Use default save path if configured
+        if (SettingsManager.Instance.IsUseSaveVideoRootPath() == AllowStatus.YES)
+        {
+            directory = SettingsManager.Instance.GetSaveVideoRootPath();
+        }
+        else
+        {
+            // Fall back to default until folder picker dialog is wired (Slice 5)
+            directory = SettingsManager.Instance.GetSaveVideoRootPath();
+        }
+
+        if (string.IsNullOrEmpty(directory)) return;
+
+        var service = new AddToDownloadService(_downloadingViewModel, _downloadFinishedViewModel);
+        int added = await service.AddToDownloadAsync(VideoInfoView, VideoSections, directory, downloadAll);
+
+        Log.Logger.Info($"Added {added} item(s) to download queue");
+
+        if (added > 0)
+        {
+            await NavigationService.ForwardAsync(DownloadManagerViewModel.Key);
+        }
     }
 
     #endregion
