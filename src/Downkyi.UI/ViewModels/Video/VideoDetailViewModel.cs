@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Downkyi.Core.Log;
 using Downkyi.Core.Settings;
@@ -9,7 +11,6 @@ using Downkyi.UI.Mvvm;
 using Downkyi.UI.Services.VideoInfo;
 using Downkyi.UI.ViewModels.DownloadManager;
 using Downkyi.UI.ViewModels.User;
-using System.Text.RegularExpressions;
 
 namespace Downkyi.UI.ViewModels.Video;
 
@@ -36,28 +37,25 @@ public partial class VideoDetailViewModel : ViewModelBase
     [ObservableProperty]
     private VideoInfoView _videoInfoView = new();
 
+    [ObservableProperty]
+    private ObservableCollection<VideoSectionItem> _videoSections = new();
+
+    [ObservableProperty]
+    private VideoSectionItem? _selectedSection;
+
+    [ObservableProperty]
+    private ObservableCollection<VideoQualityItem> _videoQualities = new();
+
+    [ObservableProperty]
+    private VideoQualityItem? _selectedQuality;
+
     #endregion
 
     public VideoDetailViewModel(BaseServices baseServices,
         IVideoInfoServiceFactory videoInfoServiceFactory) : base(baseServices)
     {
         _videoInfoServiceFactory = videoInfoServiceFactory;
-
-        #region 属性初始化
-
         ContentVisibility = true;
-
-        VideoInfoView.Title = "video name";
-
-        VideoInfoView.CoinNumber = "10";
-        VideoInfoView.DanmakuNumber = "1";
-        VideoInfoView.FavoriteNumber = "1";
-        VideoInfoView.LikeNumber = "10";
-        VideoInfoView.PlayNumber = "0";
-        VideoInfoView.ReplyNumber = "1";
-        VideoInfoView.ShareNumber = "1";
-
-        #endregion
     }
 
     #region 命令申明
@@ -76,25 +74,83 @@ public partial class VideoDetailViewModel : ViewModelBase
     [RelayCommand]
     private async Task InputAsync()
     {
-        if (InputText == null || InputText == string.Empty) { return; }
+        if (string.IsNullOrEmpty(InputText)) return;
 
         Log.Logger.Debug($"InputText: {InputText}");
         _input = Regex.Replace(InputText, @"[【]*[^【]*[^】]*[】 ]", "");
 
-        await Task.Run(() =>
+        LoadingVisibility = true;
+        ContentVisibility = false;
+
+        VideoInfoView? fetchedView = null;
+        List<Downkyi.Core.Bili.Models.VideoSection>? fetchedSections = null;
+
+        try
         {
-            // 根据输入创建对应VideoInfoService（视频、番剧、课程...）
             IVideoInfoService service = _videoInfoServiceFactory.Create(_input);
 
-            // 更新页面
-            var tryVideoInfoView = service.GetVideoView(_input);
-
-            // 是否自动解析视频
-            if (SettingsManager.Instance.IsAutoParseVideo() == AllowStatus.YES)
+            await Task.Run(async () =>
             {
-                // TODO
+                fetchedView = service.GetVideoView(_input);
+                fetchedSections = await service.GetVideoSectionsAsync(_input);
+            });
+
+            // Update UI on calling (UI) thread
+            if (fetchedView != null)
+            {
+                VideoInfoView.CoverUrl = fetchedView.CoverUrl;
+                VideoInfoView.UpperMid = fetchedView.UpperMid;
+                VideoInfoView.TypeId = fetchedView.TypeId;
+                VideoInfoView.Title = fetchedView.Title;
+                VideoInfoView.Description = fetchedView.Description;
+                VideoInfoView.VideoZone = fetchedView.VideoZone;
+                VideoInfoView.UpName = fetchedView.UpName;
+                VideoInfoView.CreateTime = fetchedView.CreateTime;
+                VideoInfoView.PlayNumber = fetchedView.PlayNumber;
+                VideoInfoView.DanmakuNumber = fetchedView.DanmakuNumber;
+                VideoInfoView.LikeNumber = fetchedView.LikeNumber;
+                VideoInfoView.CoinNumber = fetchedView.CoinNumber;
+                VideoInfoView.FavoriteNumber = fetchedView.FavoriteNumber;
+                VideoInfoView.ShareNumber = fetchedView.ShareNumber;
+                VideoInfoView.ReplyNumber = fetchedView.ReplyNumber;
             }
-        });
+
+            if (fetchedSections != null)
+            {
+                VideoSections.Clear();
+                foreach (var sec in fetchedSections)
+                {
+                    var sectionItem = new VideoSectionItem
+                    {
+                        Id = sec.Id,
+                        Title = sec.Title,
+                        IsSelected = VideoSections.Count == 0,
+                    };
+                    foreach (var page in sec.VideoPages)
+                    {
+                        sectionItem.VideoPages.Add(new VideoPageItem
+                        {
+                            Cid = page.Cid,
+                            Page = page.Page,
+                            Title = page.Title,
+                            Duration = page.Duration,
+                            IsSelected = page.IsSelected,
+                        });
+                    }
+                    VideoSections.Add(sectionItem);
+                }
+                SelectedSection = VideoSections.FirstOrDefault();
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, "VideoDetailViewModel.InputAsync failed");
+        }
+        finally
+        {
+            LoadingVisibility = false;
+            ContentVisibility = true;
+        }
     }
 
     [RelayCommand(FlowExceptionsToTaskScheduler = true)]
@@ -109,7 +165,6 @@ public partial class VideoDetailViewModel : ViewModelBase
     [RelayCommand]
     private async Task CopyCoverUrl()
     {
-        // 复制封面url到剪贴板
         await ClipboardService.SetTextAsync(VideoInfoView.CoverUrl);
         Log.Logger.Info("复制封面url到剪贴板");
     }
@@ -122,12 +177,6 @@ public partial class VideoDetailViewModel : ViewModelBase
 
     #endregion
 
-    /// <summary>
-    /// 导航到用户空间，
-    /// 如果传入的mid与本地登录的mid一致，
-    /// 则进入我的用户空间。
-    /// </summary>
-    /// <param name="mid"></param>
     private async Task NavigateToViewUserSpace(long mid)
     {
         Dictionary<string, object> parameter = new()
@@ -153,16 +202,12 @@ public partial class VideoDetailViewModel : ViewModelBase
 
         if (parameter!.TryGetValue("value", out object? value))
         {
-            // 正在执行任务时不开启新任务
             if (!LoadingVisibility)
             {
                 _input = (string)value;
                 InputText = _input;
-
                 await InputAsync();
             }
         }
-
     }
-
 }
