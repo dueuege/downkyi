@@ -12,15 +12,10 @@ public static class FFmpegHelper
     static FFmpegHelper()
     {
         is64Bit = IntPtr.Size == 8;
-
-        if (is64Bit)
-        {
-            exec = Path.Combine(Environment.CurrentDirectory, "ffmpeg.exe");
-        }
-        else
-        {
-            exec = Path.Combine(Environment.CurrentDirectory, "ffmpeg.exe");
-        }
+        string binaryName = OperatingSystem.IsWindows() ? "ffmpeg.exe" : "ffmpeg";
+        string local = Path.Combine(Environment.CurrentDirectory, binaryName);
+        // Use local binary if it exists; otherwise rely on PATH
+        exec = File.Exists(local) ? local : binaryName;
     }
 
     /// <summary>
