@@ -189,4 +189,26 @@ public class FileName
         return path.TrimEnd('/').TrimStart('/');
     }
 
+    /// <summary>
+    /// Removes characters illegal in file/directory names on Windows, macOS, and Linux.
+    /// If the result is empty, returns the fallback string "_".
+    /// Fixes v1.6.x crash: "修复标题中无合法字符时崩溃的问题"
+    /// </summary>
+    public static string Sanitize(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "_";
+
+        // Characters illegal on Windows (superset of macOS/Linux restrictions)
+        char[] illegal = Path.GetInvalidFileNameChars();
+        var sb = new System.Text.StringBuilder(name.Length);
+        foreach (char c in name)
+        {
+            if (Array.IndexOf(illegal, c) < 0)
+                sb.Append(c);
+        }
+
+        string result = sb.ToString().Trim().TrimEnd('.');
+        return string.IsNullOrWhiteSpace(result) ? "_" : result;
+    }
+
 }
