@@ -23,6 +23,7 @@ public class BangumiInfoService : IVideoInfoService
             CoverUrl = season.Cover,
             UpperMid = season.UpInfo?.Mid ?? -1,
             TypeId = 13,
+            ContentType = 1,
         };
         view.Title = season.Title;
         view.Description = season.Evaluate;
@@ -61,6 +62,9 @@ public class BangumiInfoService : IVideoInfoService
                 Title = name,
                 Duration = ep.Duration,
                 IsSelected = order == 1,
+                Avid = ep.Aid,
+                Bvid = ep.Bvid,
+                Epid = ep.Id,
             });
         }
         return pages;
@@ -93,6 +97,9 @@ public class BangumiInfoService : IVideoInfoService
                         Page = order,
                         Title = BuildEpisodeName(ep, order),
                         Duration = ep.Duration,
+                        Avid = ep.Aid,
+                        Bvid = ep.Bvid,
+                        Epid = ep.Id,
                     });
                 }
                 sections.Add(new VideoSection

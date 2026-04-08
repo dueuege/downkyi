@@ -7,6 +7,10 @@ namespace Downkyi.UI.Models
         public string CoverUrl { get; set; } = string.Empty;
         public long UpperMid { get; set; }
         public int TypeId { get; set; }
+        public long Aid { get; set; }
+        public string Bvid { get; set; } = string.Empty;
+        /// <summary>0=regular video, 1=bangumi, 2=cheese</summary>
+        public int ContentType { get; set; }
 
         [ObservableProperty]
         private string _cover = string.Empty;

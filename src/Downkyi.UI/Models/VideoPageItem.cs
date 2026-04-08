@@ -8,6 +8,9 @@ public partial class VideoPageItem : ObservableObject
     public long Cid { get; set; }
     public int Page { get; set; }
     public long Duration { get; set; }
+    public long Avid { get; set; }
+    public string Bvid { get; set; } = string.Empty;
+    public long Epid { get; set; }
 
     [ObservableProperty] private string _title = string.Empty;
     [ObservableProperty] private bool _isSelected;

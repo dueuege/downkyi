@@ -82,7 +82,11 @@ public class AddToDownloadService
                 var entity = new DownloadingEntity
                 {
                     Uuid = uuid,
+                    Avid = page.Avid,
+                    Bvid = page.Bvid,
                     Cid = page.Cid,
+                    Epid = page.Epid,
+                    ContentType = videoInfoView.ContentType,
                     Title = page.Title,
                     CoverUrl = videoInfoView.CoverUrl,
                     UpperName = videoInfoView.UpName,
@@ -101,12 +105,19 @@ public class AddToDownloadService
                 var item = new DownloadingItem
                 {
                     Uuid = uuid,
+                    Avid = page.Avid,
+                    Bvid = page.Bvid,
                     Cid = page.Cid,
+                    Epid = page.Epid,
+                    ContentType = videoInfoView.ContentType,
+                    Quality = SettingsManager.Instance.GetQuality(),
                     Title = page.Title,
                     CoverUrl = videoInfoView.CoverUrl,
                     UpperName = videoInfoView.UpName,
                     FilePath = filePath,
                     Status = DownloadStatus.Waiting,
+                    DownloadVideo = videoContent.DownloadVideo,
+                    DownloadAudio = videoContent.DownloadAudio,
                 };
 
                 _downloadingViewModel.AddItem(item);

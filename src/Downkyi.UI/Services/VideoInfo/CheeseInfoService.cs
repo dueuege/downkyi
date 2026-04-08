@@ -22,6 +22,7 @@ public class CheeseInfoService : IVideoInfoService
             CoverUrl = cheeseView.Cover,
             UpperMid = cheeseView.UpInfo?.Mid ?? -1,
             TypeId = 0,
+            ContentType = 2,
         };
         view.Title = cheeseView.Title;
         view.Description = cheeseView.Subtitle;
@@ -56,6 +57,8 @@ public class CheeseInfoService : IVideoInfoService
                 Title = string.IsNullOrEmpty(ep.Title) ? $"第{order}节" : ep.Title,
                 Duration = ep.Duration,
                 IsSelected = order == 1,
+                Avid = ep.Aid,
+                Epid = ep.Id,
             });
         }
         return pages;

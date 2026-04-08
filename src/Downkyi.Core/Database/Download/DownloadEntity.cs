@@ -32,6 +32,7 @@ public class DownloadingEntity
     [Column("status")] public DownloadStatus Status { get; set; } = DownloadStatus.NotStarted;
     [Column("progress")] public float Progress { get; set; }
     [Column("file_path")] public string FilePath { get; set; } = string.Empty;
+    [Column("content_type")] public int ContentType { get; set; }   // 0=video, 1=bangumi, 2=cheese
     [Column("download_audio")] public bool DownloadAudio { get; set; } = true;
     [Column("download_video")] public bool DownloadVideo { get; set; } = true;
     [Column("download_danmaku")] public bool DownloadDanmaku { get; set; } = true;

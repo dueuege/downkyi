@@ -142,6 +142,9 @@ public partial class VideoDetailViewModel : ViewModelBase
                             Title = page.Title,
                             Duration = page.Duration,
                             IsSelected = page.IsSelected,
+                            Avid = page.Avid != 0 ? page.Avid : (fetchedView?.Aid ?? 0),
+                            Bvid = !string.IsNullOrEmpty(page.Bvid) ? page.Bvid : (fetchedView?.Bvid ?? string.Empty),
+                            Epid = page.Epid,
                         });
                     }
                     VideoSections.Add(sectionItem);

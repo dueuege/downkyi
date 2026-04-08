@@ -21,6 +21,9 @@ public class VideoInfoService : IVideoInfoService
             CoverUrl = info.CoverUrl,
             UpperMid = info.UpperMid,
             TypeId = info.TypeId,
+            Aid = info.Aid,
+            Bvid = info.Bvid,
+            ContentType = 0,
         };
 
         view.Title = info.Title;
