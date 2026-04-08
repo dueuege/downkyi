@@ -28,4 +28,18 @@ public static class BangumiApi
         }
         catch (Exception e) { Log.Error(e, "GetBangumiSeasonInfoAsync failed"); return null; }
     }
+
+    /// <summary>Gets bangumi media info (for media URL input — needed to extract seasonId).</summary>
+    public static async Task<BangumiMedia?> GetBangumiMediaInfoAsync(long mediaId)
+    {
+        string url = $"https://api.bilibili.com/pgc/review/user?media_id={mediaId}";
+        string json = await BiliWebClient.GetAsync(url);
+        if (string.IsNullOrEmpty(json)) return null;
+        try
+        {
+            var origin = JsonSerializer.Deserialize<BangumiMediaOrigin>(json);
+            return origin?.Result?.Media;
+        }
+        catch (Exception e) { Log.Error(e, "GetBangumiMediaInfoAsync failed"); return null; }
+    }
 }

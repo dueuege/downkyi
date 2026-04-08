@@ -15,4 +15,5 @@ public class BangumiEpisode
     [JsonPropertyName("badge")] public string Badge { get; set; } = string.Empty;
     [JsonPropertyName("pub_time")] public long PubTime { get; set; }
     [JsonPropertyName("status")] public int Status { get; set; }
+    [JsonPropertyName("share_copy")] public string ShareCopy { get; set; } = string.Empty;
 }

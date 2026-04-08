@@ -23,5 +23,6 @@ public class BangumiSeason
     [JsonPropertyName("title")] public string Title { get; set; } = string.Empty;
     [JsonPropertyName("total")] public int Total { get; set; }
     [JsonPropertyName("type")] public int Type { get; set; }
+    [JsonPropertyName("type_name")] public string TypeName { get; set; } = string.Empty;
     [JsonPropertyName("up_info")] public BangumiUpInfo? UpInfo { get; set; }
 }
