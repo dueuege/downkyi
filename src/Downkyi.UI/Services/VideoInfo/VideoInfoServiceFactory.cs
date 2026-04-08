@@ -24,7 +24,7 @@ public class VideoInfoServiceFactory(IServiceProvider serviceProvider) : IVideoI
         // 课程
         if (ParseEntrance.IsCheeseSeasonUrl(input) || ParseEntrance.IsCheeseEpisodeUrl(input))
         {
-            return _serviceProvider.GetRequiredService<BangumiInfoService>();
+            return _serviceProvider.GetRequiredService<CheeseInfoService>();
         }
 
         throw new ArgumentException("Invalid type", nameof(input));
