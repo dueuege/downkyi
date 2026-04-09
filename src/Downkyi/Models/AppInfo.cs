@@ -14,15 +14,16 @@ public class AppInfo
     const int a = 2;
     const int b = 0;
     const int c = 0;
+    const string PreRelease = "beta";
 
     public AppInfo()
     {
         VersionCode = a * 10000 + b * 100 + c;
 
 #if DEBUG
-        VersionName = $"{a}.{b}.{c}-debug";
+        VersionName = $"{a}.{b}.{c}-{PreRelease}-debug";
 #else
-            VersionName = $"{a}.{b}.{c}";
+        VersionName = $"{a}.{b}.{c}-{PreRelease}";
 #endif
     }
 

@@ -3,6 +3,7 @@ using Downkyi.Services;
 using Downkyi.UI.Mvvm;
 using Downkyi.UI.Services;
 using Downkyi.UI.Services.Event;
+using Downkyi.UI.Services.Download;
 using Downkyi.UI.Services.VideoInfo;
 using Downkyi.UI.ViewModels;
 using Downkyi.UI.ViewModels.DownloadManager;
@@ -74,6 +75,8 @@ public static class ServiceLocator
         Ioc.Default.GetRequiredService<DownloadingViewModel>();
     public static DownloadFinishedViewModel DownloadFinishedViewModel =>
         Ioc.Default.GetRequiredService<DownloadFinishedViewModel>();
+    public static BuiltinDownloadService BuiltinDownloadService =>
+        Ioc.Default.GetRequiredService<BuiltinDownloadService>();
 
     // 工具箱
     public static ToolboxViewModel ToolboxViewModel =>
@@ -118,6 +121,7 @@ public static class ServiceLocator
                 .AddSingleton<DownloadManagerViewModel>()
                 .AddSingleton<DownloadingViewModel>()
                 .AddSingleton<DownloadFinishedViewModel>()
+                .AddSingleton<BuiltinDownloadService>()
                 //
                 .AddSingleton<LoginViewModel>()
                 .AddSingleton<QRCodeViewModelProxy>()

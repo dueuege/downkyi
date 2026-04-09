@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git ls-tree:*)",
+      "Bash(grep -v \"\\\\.cs$\")",
+      "Bash(grep \"\\\\.cs$\")",
+      "Bash(ls -la /mnt/c/Users/envy15/Documents/programming/github/dueuege/downkyi/src/DownKyi.Core/Danmaku*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(dotnet nuget:*)",
+      "Bash(git commit:*)",
+      "Read(//usr/bin/**)",
+      "Read(//usr/local/bin/**)",
+      "Bash(\"/mnt/c/Program Files/dotnet/dotnet.exe\" --version)",
+      "Bash(\"/mnt/c/Program Files/dotnet/dotnet.exe\" run)",
+      "Bash(\"/mnt/c/Program Files/dotnet/dotnet.exe\" build DownKyi.Core/Downkyi.Core.csproj)"
+    ]
+  }
+}

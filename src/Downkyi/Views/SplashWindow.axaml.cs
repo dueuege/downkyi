@@ -3,6 +3,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Downkyi.Models;
 using System;
+using System.Threading.Tasks;
 
 namespace Downkyi.Views;
 
@@ -30,8 +31,15 @@ public partial class SplashWindow : Window
 
     private async void DummyLoad()
     {
-        // Do some background stuff here.
-        //Task.Delay(1000);
+        // Resolve BuiltinDownloadService on the UI thread so it captures the correct SynchronizationContext
+        var downloadService = ServiceLocator.BuiltinDownloadService;
+
+        // Restore persisted download state
+        await ServiceLocator.DownloadingViewModel.LoadAsync();
+        await ServiceLocator.DownloadFinishedViewModel.LoadAsync();
+
+        // Start the download engine
+        downloadService.Start();
 
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
